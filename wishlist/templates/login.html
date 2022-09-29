@@ -6,7 +6,34 @@
 
 {% block content %}
 
-<div class = "login">
+<div class="mx-auto" style="width: 1000px; padding: 100px;">
+    <form method="POST" action="">
+        {% csrf_token %}
+
+        <!-- Email input -->
+        <div class="form-outline mb-4">
+        <input type="text" id="form2Example1" class="form-control" name="username" placeholder="Username"/>
+        <label class="form-label" for="form2Example1">Username</label>
+        </div>
+    
+        <!-- Password input -->
+        <div class="form-outline mb-4">
+        <input type="password" id="form2Example2" class="form-control" name="password" placeholder="Password"/>
+        <label class="form-label" for="form2Example2">Password</label>
+        </div>
+    
+        <!-- Submit button -->
+        <!-- <button type="button" class="btn btn-primary btn-block mb-4">Sign in</button> -->
+        <input class="btn btn-primary btn-block mb-4" type="submit" value="Login">
+    
+        <!-- Register buttons -->
+        <div class="text-center">
+        <p>Not a member? <a href="{% url 'wishlist:register' %}">Register</a></p>
+
+        </div>
+    </form>
+</div>
+<!-- <div class = "login">
 
     <h1>Login</h1>
 
@@ -40,6 +67,6 @@
         
     Belum mempunyai akun? <a href="{% url 'wishlist:register' %}">Buat Akun</a>
 
-</div>
+</div> -->
 
 {% endblock content %}
