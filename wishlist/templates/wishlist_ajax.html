@@ -18,6 +18,7 @@
 <br>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
 <script>
 
   $.ajax({
@@ -70,6 +71,14 @@
     <button type="submit" id="btn-submit">Tambahkan</button>
   </form>
 </div>
+<script>
+  $('#btn-submit').click(function(){
+    var name = $('#nama').val();
+    var harga = $('#harga').val();
+    var deskripsi = $('#deskripsi').val();
+
+  })
+</script>
 
 <h5 class="mx-auto" style="width: 1000px; padding: 100px;">Sesi terakhir login: {{ last_login }}</h5>
 
