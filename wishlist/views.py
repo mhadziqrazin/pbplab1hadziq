@@ -22,6 +22,16 @@ def show_wishlist(request):
     }
     return render(request, "wishlist.html", context)
 
+@login_required(login_url='/wishlist/login/')
+def wishlist_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    context = {
+        'list_barang': data_barang_wishlist,
+        'nama': 'Hadziq',
+        'last_login': request.COOKIES['last_login'],
+    }
+    return render(request, "wishlist_ajax.html", context)
+
 def register(request):
     form = UserCreationForm()
 

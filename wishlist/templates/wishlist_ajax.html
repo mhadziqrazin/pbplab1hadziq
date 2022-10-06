@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<nav class="navbar navbar-dark bg-dark">
+    <div class="container-fluid">
+      <ul class="nav nav-pills">
+        <li class="nav-item">
+          <a class="nav-link" aria-current="page" href="#">{{nama}}</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'wishlist:logout' %}">Logout</a>
+        </li>
+      
+    </div>
+  </nav>
+<br>
+<br>
+<br>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+
+  $.ajax({
+    type: 'GET',
+    url: 'http://127.0.0.1:8000/wishlist/json/',
+    dataType: 'json',
+    success: function(data) {
+      var data1 = JSON.stringify(data);
+      var lists = JSON.parse(data1);
+      console.log(lists[0].fields['nama_barang'])
+      for (var i = 0; i < data.length; i++) {
+        var baris = $('<tr><td>' + lists[i].fields['nama_barang'] + '</td><td>' + lists[i].fields['harga_barang'] + '</td><td>' + lists[i].fields['deskripsi'] + '</td></tr>');
+        $('#mylist').append(baris);
+      }
+    },
+  });
+
+</script>
+
+<table id="mylist" class="table table-striped table-hover mx-auto" style="width: 1100px; padding: 50px;">
+    <thead>
+        <tr>
+            <th>Nama Barang</th>
+            <th>Harga Barang</th>
+            <th>Deskripsi</th>
+        </tr>
+    </thead>
+    <!-- <tbody>
+        {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
+        {% for barang in list_barang %}
+        <tr>
+            <th>{{barang.nama_barang}}</th>
+            <th>{{barang.harga_barang}}</th>
+            <th>{{barang.deskripsi}}</th>
+        </tr>
+        {% endfor %}
+    </tbody> -->
+</table>
+<div class="container-fluid">
+  <form>
+    <label class="nama" for="nama">Nama barang</label>
+    <input type="text" id="nama" class="form-control" name="nama"/>
+
+    <label class="harga" for="harga">Harga</label>
+    <input type="text" id="harga" class="form-control" name="harga"/>
+
+    <label class="deskripsi" for="deskripsi">Deskripsi</label>
+    <input type="text" id="deskripsi" class="form-control" name="deskripsi"/>
+
+    <button type="submit" id="btn-submit">Tambahkan</button>
+  </form>
+</div>
+
+<h5 class="mx-auto" style="width: 1000px; padding: 100px;">Sesi terakhir login: {{ last_login }}</h5>
+
+
+{% endblock content %}
