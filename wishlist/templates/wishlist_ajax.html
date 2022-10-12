@@ -18,34 +18,117 @@
 <br>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script> -->
 <script>
 
-  $.ajax({
-    type: 'GET',
-    url: 'http://127.0.0.1:8000/wishlist/json/',
-    dataType: 'json',
-    success: function(data) {
-      var data1 = JSON.stringify(data);
-      var lists = JSON.parse(data1);
-      console.log(lists[0].fields['nama_barang'])
-      for (var i = 0; i < data.length; i++) {
-        var baris = $('<tr><td>' + lists[i].fields['nama_barang'] + '</td><td>' + lists[i].fields['harga_barang'] + '</td><td>' + lists[i].fields['deskripsi'] + '</td></tr>');
-        $('#mylist').append(baris);
-      }
-    },
-  });
+    async function getDataBarang() {
+        return fetch("{% url 'get_wishlist_ajax' %}").then((res) => res.json())
+    }
+
+    async function refreshWishlist() {
+        document.getElementById("mylist").innerHTML = ""
+        const wishlist = await getDataBarang()
+        let table = `<tr>
+            <th>Nama Barang</th>
+            <th>Harga Barang</th>
+            <th>Deskripsi</th>
+        </tr>`
+        wishlist.forEach((item) => {
+            table += `\n<tr>
+                <td>${item.fields.nama_barang}</td>
+                <td>${item.fields.harga_barang}</td>
+                <td>${item.fields.deskripsi}</td>
+            </tr>`
+        });
+        document.getElementById("mylist").innerHTML = table
+    }
+
+    function addWishlsit() {
+        fetch("{% url 'add_wishlist' %}", {
+            method: "POST",
+            body: new FormData(document.querySelector('#form_add'))
+        }).then(refreshWishlist)
+        return false
+    }
+
+    document.getElementById('btn-submit').onclick = addWishlsit
+    refreshWishlist()
+    // $(document).ready(function() {
+    //     get_data_barang();
+    //     function get_data_barang() {
+    //         $.get("../json", function(data) {
+    //             data.forEach(element => {
+    //                 var tr = $("<tr></tr>");
+    //                 for (const [key, value] of Object.entries(element.fields)) {
+    //                     var td = $("<td></td>").html(value);
+    //                     tr.append(td);
+    //                 }
+    //                 $("#mylist").append(tr);
+    //             });
+    //         });
+    //     }
+
+    //     $("#btn-submit").submit(function(event) {
+
+    //         event.preventDefault();
+    //         var url = event.currentTarget.action;
+        
+    //         $.ajax({
+    //             url: "{% url 'wishlist:add_wishlist' %}",
+    //             type: post,
+    //             dataType: 'json',
+    //             success: function(data) {
+
+    //                 for (i=0; i<data.length; i++) {
+    //                     $("#mylist").append("<tr>"+data[i].fields.nama_barang+"</tr>")
+    //                 }
+    //                 get_data_barang();
+
+
+    //             }
+    //         });
+    //         // $.ajax({
+    //         //     url: "{% url 'wishlist:add_wishlist' %}",
+    //         //     type: post,
+    //         //     dataType: 'json',
+    //         //     success: function(data) {
+    //         //         var tr = $("<tr></tr>");
+    //         //         for (const [key, value] of Object.entries(data)) {
+    //         //             var td = $("<td></td>").html(value);
+    //         //             tr.append(td);
+    //         //         }
+    //         //         $("#mylist").append(tr);
+
+    //         //     }
+    //         // });
+    //     });
+    // });
+
+  // $.ajax({
+  //   type: 'GET',
+  //   url: 'http://127.0.0.1:8000/wishlist/json/',
+  //   dataType: 'json',
+  //   success: function(data) {
+  //     var data1 = JSON.stringify(data);
+  //     var lists = JSON.parse(data1);
+  //     // console.log(lists[0].fields['nama_barang'])
+  //     for (var i = 0; i < data.length; i++) {
+  //       var baris = $('<tr><td>' + lists[i].fields['nama_barang'] + '</td><td>' + lists[i].fields['harga_barang'] + '</td><td>' + lists[i].fields['deskripsi'] + '</td></tr>');
+  //       $('#mylist').append(baris);
+  //     }
+  //   },
+  // });
 
 </script>
-
+<body>
 <table id="mylist" class="table table-striped table-hover mx-auto" style="width: 1100px; padding: 50px;">
-    <thead>
+    <!-- <thead>
         <tr>
             <th>Nama Barang</th>
             <th>Harga Barang</th>
             <th>Deskripsi</th>
         </tr>
-    </thead>
+    </thead> -->
     <!-- <tbody>
         {% comment %} Tambahkan data di bawah baris ini {% endcomment %}
         {% for barang in list_barang %}
@@ -58,9 +141,10 @@
     </tbody> -->
 </table>
 <div class="container-fluid">
-  <form>
+  <form id="form_add" method="POST" action="{% url 'wishlist:add_wishlist' %}">
+    {% csrf_token %}
     <label class="nama" for="nama">Nama barang</label>
-    <input type="text" id="nama" class="form-control" name="nama"/>
+    <input type="text" id="nama" class="form-control" name="nama_barang"/>
 
     <label class="harga" for="harga">Harga</label>
     <input type="text" id="harga" class="form-control" name="harga"/>
@@ -71,16 +155,24 @@
     <button type="submit" id="btn-submit">Tambahkan</button>
   </form>
 </div>
-<script>
+<!-- <script>
   $('#btn-submit').click(function(){
-    var name = $('#nama').val();
+    var nama = $('#nama').val();
     var harga = $('#harga').val();
     var deskripsi = $('#deskripsi').val();
 
+    $.post("",{
+      nama:nama,
+      harga:harga,
+      deskripsi:deskripsi,
+    }), function(response){
+      
+    }
+
   })
-</script>
+</script> -->
 
 <h5 class="mx-auto" style="width: 1000px; padding: 100px;">Sesi terakhir login: {{ last_login }}</h5>
-
+</body>
 
 {% endblock content %}

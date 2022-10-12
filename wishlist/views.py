@@ -1,6 +1,7 @@
+from curses.ascii import HT
 from django.shortcuts import render
 from wishlist.models import BarangWishlist
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.core import serializers
 from django.shortcuts import redirect
 from django.contrib.auth.forms import UserCreationForm
@@ -24,13 +25,52 @@ def show_wishlist(request):
 
 @login_required(login_url='/wishlist/login/')
 def wishlist_ajax(request):
-    data_barang_wishlist = BarangWishlist.objects.all()
     context = {
-        'list_barang': data_barang_wishlist,
         'nama': 'Hadziq',
         'last_login': request.COOKIES['last_login'],
     }
     return render(request, "wishlist_ajax.html", context)
+    # data_barang_wishlist = BarangWishlist.objects.all()
+    # context = {
+    #     'list_barang': data_barang_wishlist,
+    #     'nama': 'Hadziq',
+    #     'last_login': request.COOKIES['last_login'],
+    # }
+
+
+@login_required(login_url='/wishlist/login/')
+def get_wishlist_ajax(request):
+    data_barang_wishlist = BarangWishlist.objects.all()
+    return HttpResponse(serializers.serialize('json', data_barang_wishlist))
+
+@login_required(login_url="/wishlist/login/")
+def add_wishlist(request):
+    if request.method == 'POST':
+        nama_barang = request.POST.get('nama_barang')
+        harga = request.POST.get('harga')
+        deskripsi = request.POST.get('deskripsi')
+        new_barang = BarangWishlist(
+            nama_barang = nama_barang,
+            harga_barang = harga,
+            deskripsi = deskripsi,
+        )
+        new_barang.save()
+        return HttpResponse(b"Created", status=201)
+    return HttpResponseNotFound()
+    # if request.method == "POST":
+    #     nama_barang = request.POST.get('nama_barang')
+    #     harga = request.POST.get('harga')
+    #     deskripsi = request.POST.get('deskripsi')
+    #     new_barang = BarangWishlist(
+    #         nama_barang = nama_barang,
+    #         harga_barang = harga,
+    #         deskripsi = deskripsi,
+    #     )
+    #     new_barang.save()
+    #     data_barang_wishlist = BarangWishlist.objects.all()
+    # return HttpResponse(b"Created", status=201)
+    # return redirect('wishlist:wishlist_ajax')
+
 
 def register(request):
     form = UserCreationForm()
